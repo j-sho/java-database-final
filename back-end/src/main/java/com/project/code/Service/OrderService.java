@@ -1,7 +1,7 @@
 package com.project.code.Service;
 
-import com.project.code.DTO.PlaceOrderRequestDTO;
-import com.project.code.DTO.PurchaseProductDTO;
+import com.project.code.Model.PlaceOrderRequestDTO;
+import com.project.code.Model.PurchaseProductDTO;
 import com.project.code.Model.*;
 import com.project.code.Repo.*;
 import org.springframework.beans.factory.annotation.Autowired;

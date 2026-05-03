@@ -38,7 +38,7 @@ public class ReviewController {
             reviewMap.put("rating", review.getRating());
             
             // Fetch customer name using customerId
-            Customer customer = customerRepository.findById(review.getCustomerId());
+            Customer customer = customerRepository.findById(review.getCustomerId()).orElse(null);
             if (customer != null) {
                 reviewMap.put("customerName", customer.getName());
             } else {

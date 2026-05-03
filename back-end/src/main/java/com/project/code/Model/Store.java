@@ -18,6 +18,7 @@ public class Store {
     // 2. Add 'name' field:
     //    - Type: private String
     @NotNull(message = "Name cannot be null")
+    @NotBlank(message = "Name cannot be blank")
     private String name;
 
     // 3. Add 'address' field:

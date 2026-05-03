@@ -14,14 +14,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     //      - Parameter: String email
     public Customer findByEmail(String email);
 
-    //    - **findById**:
-    //      - This method will allow you to find a customer by their ID.
-    //      - Return type: Customer
-    //      - Parameter: Long id
-    // Note: JpaRepository already provides Optional<Customer> findById(Long id). 
-    // This custom method returns Customer directly.
-    public Customer findById(Long id);
-
     // 3. Add any additional methods you may need for custom queries:
     // Example: public List<Customer> findByName(String name);
 }

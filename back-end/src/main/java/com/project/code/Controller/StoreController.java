@@ -32,8 +32,7 @@ public class StoreController {
     // 4. Define the `validateStore` Method:
     @GetMapping("validate/{storeId}")
     public boolean validateStore(@PathVariable Long storeId) {
-        Store store = storeRepository.findById(storeId);
-        return store != null;
+        return storeRepository.findById(storeId).isPresent();
     }
 
     // 5. Define the `placeOrder` Method:

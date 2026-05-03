@@ -10,13 +10,6 @@ import java.util.List;
 @Repository
 public interface StoreRepository extends JpaRepository<Store, Long> {
 
-    // 2. Add custom query methods:
-    //    - **findById**:
-    //      - This method will retrieve a store by its ID.
-    //      - Return type: Store
-    //      - Parameter: Long id
-    public Store findById(Long id);
-
     //    - **findBySubName**:
     //      - This method will retrieve stores whose name contains a given substring.
     //      - Return type: List<Store>

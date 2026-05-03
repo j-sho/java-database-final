@@ -47,7 +47,7 @@ public class ServiceClass {
     //    - Parameters: `long id`
     //    - Return Type: `boolean` (Returns `false` if the product does not exist with the given ID, otherwise `true`)
     public boolean ValidateProductId(long id) {
-        Product existingProduct = productRepository.findById(id);
+        Product existingProduct = productRepository.findById(id).orElse(null);
         // Returns false if the product does not exist, otherwise true
         return existingProduct != null;
     }

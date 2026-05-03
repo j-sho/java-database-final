@@ -38,19 +38,19 @@ public class OrderService {
         // 2. **Retrieve or Create the Customer**:
         //    - Check if the customer exists by their email using `findByEmail`.
         //    - If the customer exists, use the existing customer; otherwise, create and save a new customer using `customerRepository.save()`.
-        Customer customer = customerRepository.findByEmail(placeOrderRequest.getEmail());
+        Customer customer = customerRepository.findByEmail(placeOrderRequest.getCustomerEmail());
         if (customer == null) {
             customer = new Customer();
-            customer.setEmail(placeOrderRequest.getEmail());
-            customer.setName(placeOrderRequest.getName());
-            customer.setPhone(placeOrderRequest.getPhone());
+            customer.setEmail(placeOrderRequest.getCustomerEmail());
+            customer.setName(placeOrderRequest.getCustomerName());
+            customer.setPhone(placeOrderRequest.getCustomerPhone());
             customer = customerRepository.save(customer);
         }
 
         // 3. **Retrieve the Store**:
         //    - Fetch the store by ID from `storeRepository`.
         //    - If the store doesn't exist, throw an exception. Use `storeRepository.findById()`.
-        Store store = storeRepository.findById(placeOrderRequest.getStoreId());
+        Store store = storeRepository.findById(placeOrderRequest.getStoreId()).orElse(null);
         if (store == null) {
             throw new RuntimeException("Store not found with id: " + placeOrderRequest.getStoreId());
         }
@@ -68,12 +68,12 @@ public class OrderService {
         // 5. **Create and Save OrderItems**:
         //    - For each product purchased, find the corresponding inventory, update stock levels, and save the changes using `inventoryRepository.save()`.
         //    - Create and save `OrderItem` for each product and associate it with the `OrderDetails` using `orderItemRepository.save()`.
-        if (placeOrderRequest.getPurchaseProducts() != null) {
-            for (PurchaseProductDTO purchaseProduct : placeOrderRequest.getPurchaseProducts()) {
+        if (placeOrderRequest.getPurchaseProduct() != null) {
+            for (PurchaseProductDTO purchaseProduct : placeOrderRequest.getPurchaseProduct()) {
                 
                 // Update Inventory
                 Inventory inventory = inventoryRepository.findByProductIdandStoreId(
-                    purchaseProduct.getProductId(), 
+                    purchaseProduct.getId(), 
                     store.getId()
                 );
                 
@@ -83,7 +83,7 @@ public class OrderService {
                 }
 
                 // Create and Save OrderItem
-                Product product = productRepository.findById(purchaseProduct.getProductId());
+                Product product = productRepository.findById(purchaseProduct.getId()).orElse(null);
                 OrderItem orderItem = new OrderItem();
                 orderItem.setOrder(orderDetails);
                 orderItem.setProduct(product);

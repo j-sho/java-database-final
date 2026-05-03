@@ -26,7 +26,7 @@ public class ProductController {
     @Autowired
     private InventoryRepository inventoryRepository;
 
-    // 3. Define the `addProduct` Method:
+    // 1. **addProduct Method**:
     @PostMapping
     public Map<String, String> addProduct(@RequestBody Product product) {
         Map<String, String> response = new HashMap<>();
@@ -47,16 +47,18 @@ public class ProductController {
         return response;
     }
 
-    // 4. Define the `getProductbyId` Method:
-    @GetMapping("/product/{id}")
+    // 2. **getProductbyId Method**:
+    //    - Exposes a GET /{id} endpoint to retrieve a product by its ID.
+    //    - Full Path: GET /product/{id}
+    @GetMapping("/{id}")
     public Map<String, Object> getProductbyId(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
         Optional<Product> product = productRepository.findById(id);
-        response.put("products", product.orElse(null));
+        response.put("product", product.orElse(null));
         return response;
     }
 
-    // 5. Define the `updateProduct` Method:
+    // 3. **updateProduct Method**:
     @PutMapping
     public Map<String, String> updateProduct(@RequestBody Product product) {
         Map<String, String> response = new HashMap<>();
@@ -69,7 +71,7 @@ public class ProductController {
         return response;
     }
 
-    // 6. Define the `filterbyCategoryProduct` Method:
+    // 4. **filterbyCategoryProduct Method**:
     @GetMapping("/category/{name}/{category}")
     public Map<String, Object> filterbyCategoryProduct(@PathVariable String name, @PathVariable String category) {
         Map<String, Object> response = new HashMap<>();
@@ -87,7 +89,7 @@ public class ProductController {
         return response;
     }
 
-    // 7. Define the `listProduct` Method:
+    // 5. **listProduct Method**:
     @GetMapping
     public Map<String, Object> listProduct() {
         Map<String, Object> response = new HashMap<>();
@@ -96,16 +98,18 @@ public class ProductController {
         return response;
     }
 
-    // 8. Define the `getProductbyCategoryAndStoreId` Method:
+    // 6. **getProductbyCategoryAndStoreId Method**:
     @GetMapping("filter/{category}/{storeid}")
     public Map<String, Object> getProductbyCategoryAndStoreId(@PathVariable String category, @PathVariable Long storeid) {
         Map<String, Object> response = new HashMap<>();
         List<Product> products = productRepository.findProductByCategory(category, storeid);
-        response.put("product", products);
+        response.put("products", products);
         return response;
     }
 
-    // 9. Define the `deleteProduct` Method:
+    // 7. **deleteProduct Method**:
+    //    - Exposes a DELETE /{id} endpoint that deletes both product and inventory entries.
+    //    - Full Path: DELETE /product/{id}
     @DeleteMapping("/{id}")
     public Map<String, String> deleteProduct(@PathVariable Long id) {
         Map<String, String> response = new HashMap<>();
@@ -114,13 +118,15 @@ public class ProductController {
             return response;
         }
 
+        // Delete from inventory first to avoid constraint issues, then delete the product
         inventoryRepository.deleteByProductId(id);
         productRepository.deleteById(id);
+        
         response.put("message", "Product was deleted");
         return response;
     }
 
-    // 10. Define the `searchProduct` Method:
+    // 8. **searchProduct Method**:
     @GetMapping("/searchProduct/{name}")
     public Map<String, Object> searchProduct(@PathVariable String name) {
         Map<String, Object> response = new HashMap<>();

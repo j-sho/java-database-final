@@ -24,10 +24,11 @@ public class ServiceClass {
     //    - Parameters: `Inventory inventory`
     //    - Return Type: `boolean` (Returns `false` if inventory exists, otherwise `true`)
     public boolean validateInventory(Inventory inventory) {
-        Inventory existingInventory = inventoryRepository.findByProductIdandStoreId(
-            inventory.getProduct().getId(), 
-            inventory.getStore().getId()
-        );
+        Long productId = inventory.getProduct().getId();
+        Long storeId = inventory.getStore().getId();
+        
+        Inventory existingInventory = inventoryRepository.findByProductIdandStoreId(productId, storeId);
+        
         // Returns false if an inventory record already exists, otherwise true
         return existingInventory == null;
     }
@@ -57,9 +58,9 @@ public class ServiceClass {
     //    - Parameters: `Inventory inventory`
     //    - Return Type: `Inventory` (Returns the inventory record for the product-store combination)
     public Inventory getInventoryId(Inventory inventory) {
-        return inventoryRepository.findByProductIdandStoreId(
-            inventory.getProduct().getId(), 
-            inventory.getStore().getId()
-        );
+        Long productId = inventory.getProduct().getId();
+        Long storeId = inventory.getStore().getId();
+        
+        return inventoryRepository.findByProductIdandStoreId(productId, storeId);
     }
 }

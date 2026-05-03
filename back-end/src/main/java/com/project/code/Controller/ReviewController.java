@@ -22,7 +22,15 @@ public class ReviewController {
     @Autowired
     private CustomerRepository customerRepository;
 
-    // 3. Define the `getReviews` Method:
+    // 1. Define the `getAllReviews` Method:
+    //    - This method will return all reviews from the database.
+    @GetMapping
+    public List<Review> getAllReviews() {
+        return reviewRepository.findAll();
+    }
+
+    // 2. Define the `getReviews` Method:
+    //    - This method will return all reviews for a specific product and store, including customer names.
     @GetMapping("/{storeId}/{productId}")
     public Map<String, Object> getReviews(@PathVariable Long storeId, @PathVariable Long productId) {
         Map<String, Object> response = new HashMap<>();

@@ -20,30 +20,40 @@ public class StoreController {
     @Autowired
     private OrderService orderService;
 
-    // 3. Define the `addStore` Method:
+    // 1. **addStore Method**:
     @PostMapping
     public Map<String, String> addStore(@RequestBody Store store) {
         Map<String, String> response = new HashMap<>();
-        Store savedStore = storeRepository.save(store);
-        response.put("message", "Store created successfully with ID: " + savedStore.getId());
+        try {
+            Store savedStore = storeRepository.save(store);
+            response.put("message", "Store created successfully with ID: " + savedStore.getId());
+        } catch (Exception e) {
+            response.put("message", "Error creating store: " + e.getMessage());
+        }
         return response;
     }
 
-    // 4. Define the `validateStore` Method:
-    @GetMapping("validate/{storeId}")
-    public boolean validateStore(@PathVariable Long storeId) {
-        return storeRepository.findById(storeId).isPresent();
+    // 2. **validateStore Method**:
+    //    - Exposes a GET endpoint to validate store existence.
+    //    - Endpoint: GET /store/validate/store/{id}
+    @GetMapping("/validate/store/{id}")
+    public boolean validateStore(@PathVariable Long id) {
+        // Checks for store existence in the database
+        return storeRepository.findById(id).isPresent();
     }
 
-    // 5. Define the `placeOrder` Method:
+    // 3. **placeOrder Method**:
+    //    - Processes an order and handles exceptions using a try-catch block.
     @PostMapping("/placeOrder")
     public Map<String, String> placeOrder(@RequestBody PlaceOrderRequestDTO placeOrderRequest) {
         Map<String, String> response = new HashMap<>();
+        // Exception handling using try-catch block
         try {
             orderService.saveOrder(placeOrderRequest);
             response.put("message", "Order placed successfully");
         } catch (Exception e) {
-            response.put("Error", e.getMessage());
+            // Return error message in case of failure
+            response.put("message", "Order placement failed: " + e.getMessage());
         }
         return response;
     }

@@ -1,4 +1,5 @@
-const apiURL = '';
+const apiURL = 'https://shorjul-8080.theiadockernext-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai';
+
 let students = [];
 let Ordercount = 1;
 let deleteRow = [];

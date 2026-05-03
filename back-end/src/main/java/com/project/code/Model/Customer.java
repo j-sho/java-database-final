@@ -1,9 +1,17 @@
 package com.project.code.Model;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Customer {
@@ -12,23 +20,30 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Valid
     @NotNull(message = "Name cannot be null")
     private String name;
 
     @NotNull(message = "Email cannot be null")
     private String email;
 
-    @NotNull(message = "Phone cannot be null")
+    @NotNull(message = "Phone No cannot be null")
     private String phone;
 
-    // 5. One-to-many relationship with OrderDetails:
-    //    - A customer can have multiple orders.
-    //    - The relationship is fetched eagerly using fetch = FetchType.EAGER.
     @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER)
-    @JsonManagedReference("customer-orders")
+    @JsonManagedReference
     private List<OrderDetails> orders;
 
+    // Constructors
     public Customer() {}
+
+    public Customer(String name, String email, String phone) {
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+    }
+
+    // Getters and Setters
 
     public Long getId() {
         return id;

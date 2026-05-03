@@ -1,17 +1,25 @@
 package com.project.code.Controller;
 
-import com.project.code.Model.Product;
-import com.project.code.Repo.InventoryRepository;
-import com.project.code.Repo.ProductRepository;
-import com.project.code.Service.ServiceClass;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.project.code.Model.Product;
+import com.project.code.Repo.InventoryRepository;
+import com.project.code.Repo.OrderItemRepository;
+import com.project.code.Repo.ProductRepository;
+import com.project.code.Service.ServiceClass;
 
 @RestController
 @RequestMapping("/product")
@@ -21,117 +29,103 @@ public class ProductController {
     private ProductRepository productRepository;
 
     @Autowired
+    private OrderItemRepository orderItemRepository;
+
+    @Autowired
     private ServiceClass serviceClass;
 
     @Autowired
     private InventoryRepository inventoryRepository;
 
-    // 1. **addProduct Method**:
     @PostMapping
     public Map<String, String> addProduct(@RequestBody Product product) {
-        Map<String, String> response = new HashMap<>();
-        try {
-            // Validate product existence
-            if (!serviceClass.validateProduct(product)) {
-                response.put("message", "Product already exists");
-                return response;
-            }
-
-            productRepository.save(product);
-            response.put("message", "Product added successfully");
-        } catch (DataIntegrityViolationException e) {
-            response.put("message", "Data integrity violation: " + e.getMessage());
-        } catch (Exception e) {
-            response.put("message", "An error occurred: " + e.getMessage());
+        Map<String, String> map = new HashMap<>();
+        if (!serviceClass.validateProduct(product)) {
+            map.put("message", "Product already present in database");
+            return map;
         }
-        return response;
+        try {
+            productRepository.save(product);
+            map.put("message", "Product added successfully");
+        } catch (DataIntegrityViolationException e) {
+            map.put("message", "SKU should be unique");
+        }
+        return map;
     }
 
-    // 2. **getProductbyId Method**:
-    //    - Exposes a GET /{id} endpoint to retrieve a product by its ID.
-    //    - Full Path: GET /product/{id}
+    // Fixed mapping to /{id} so that the full path is /product/{id}
     @GetMapping("/{id}")
     public Map<String, Object> getProductbyId(@PathVariable Long id) {
-        Map<String, Object> response = new HashMap<>();
-        Optional<Product> product = productRepository.findById(id);
-        response.put("product", product.orElse(null));
-        return response;
+        System.out.println("result: ");
+        Map<String, Object> map = new HashMap<>();
+        Product result = productRepository.findById(id).orElse(null);
+        System.out.println("result: " + result);
+        map.put("products", result);
+        return map;
     }
 
-    // 3. **updateProduct Method**:
     @PutMapping
     public Map<String, String> updateProduct(@RequestBody Product product) {
-        Map<String, String> response = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         try {
             productRepository.save(product);
-            response.put("message", "Successfully updated product");
+            map.put("message", "Data updated successfully");
         } catch (Exception e) {
-            response.put("message", "An error occurred: " + e.getMessage());
+            map.put("message", "Error occurred");
         }
-        return response;
+        return map;
     }
 
-    // 4. **filterbyCategoryProduct Method**:
     @GetMapping("/category/{name}/{category}")
     public Map<String, Object> filterbyCategoryProduct(@PathVariable String name, @PathVariable String category) {
-        Map<String, Object> response = new HashMap<>();
-        List<Product> products;
-
-        if ("null".equals(name)) {
-            products = productRepository.findByCategory(category);
-        } else if ("null".equals(category)) {
-            products = productRepository.findProductBySubName(name);
-        } else {
-            products = productRepository.findProductBySubNameAndCategory(name, category);
+        Map<String, Object> map = new HashMap<>();
+        if (name.equals("null")) {
+            map.put("products", productRepository.findByCategory(category));
+            return map;
+        } else if (category.equals("null")) {
+            map.put("products", productRepository.findProductBySubName(name));
+            return map;
         }
-
-        response.put("products", products);
-        return response;
+        map.put("products", productRepository.findProductBySubNameAndCategory(name, category));
+        return map;
     }
 
-    // 5. **listProduct Method**:
     @GetMapping
     public Map<String, Object> listProduct() {
-        Map<String, Object> response = new HashMap<>();
-        List<Product> products = productRepository.findAll();
-        response.put("products", products);
-        return response;
+        Map<String, Object> map = new HashMap<>();
+        map.put("products", productRepository.findAll());
+        return map;
     }
 
-    // 6. **getProductbyCategoryAndStoreId Method**:
     @GetMapping("filter/{category}/{storeid}")
-    public Map<String, Object> getProductbyCategoryAndStoreId(@PathVariable String category, @PathVariable Long storeid) {
-        Map<String, Object> response = new HashMap<>();
-        List<Product> products = productRepository.findProductByCategory(category, storeid);
-        response.put("products", products);
-        return response;
+    public Map<String, Object> getProductbyCategoryAndStoreId(@PathVariable String category, @PathVariable long storeid) {
+        Map<String, Object> map = new HashMap<>();
+        List result = productRepository.findProductByCategory(category, storeid);
+        map.put("product", result);
+        return map;
     }
 
-    // 7. **deleteProduct Method**:
-    //    - Exposes a DELETE /{id} endpoint that deletes both product and inventory entries.
-    //    - Full Path: DELETE /product/{id}
     @DeleteMapping("/{id}")
     public Map<String, String> deleteProduct(@PathVariable Long id) {
-        Map<String, String> response = new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         if (!serviceClass.ValidateProductId(id)) {
-            response.put("message", "Product not present in database");
-            return response;
+            map.put("message", "Id " + id + " not present in database");
+            return map;
         }
-
-        // Delete from inventory first to avoid constraint issues, then delete the product
-        inventoryRepository.deleteByProductId(id);
-        productRepository.deleteById(id);
         
-        response.put("message", "Product was deleted");
-        return response;
+        // Deletes both product, inventory, and order items entries
+        inventoryRepository.deleteByProductId(id);
+        orderItemRepository.deleteByProductId(id);
+        productRepository.deleteById(id);
+
+        map.put("message", "Deleted product successfully with id: " + id);
+        return map;
     }
 
-    // 8. **searchProduct Method**:
     @GetMapping("/searchProduct/{name}")
     public Map<String, Object> searchProduct(@PathVariable String name) {
-        Map<String, Object> response = new HashMap<>();
-        List<Product> products = productRepository.findProductBySubName(name);
-        response.put("products", products);
-        return response;
+        Map<String, Object> map = new HashMap<>();
+        map.put("products", productRepository.findProductBySubName(name));
+        return map;
     }
 }

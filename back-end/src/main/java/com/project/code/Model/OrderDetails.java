@@ -1,10 +1,19 @@
 package com.project.code.Model;
 
-import jakarta.persistence.*;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class OrderDetails {
@@ -15,21 +24,22 @@ public class OrderDetails {
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    @JsonBackReference("customer-orders")
+    @JsonBackReference // Changed to BackReference to prevent infinite loop with Customer.orders
     private Customer customer;
 
     @ManyToOne
     @JoinColumn(name = "store_id")
-    @JsonBackReference("store-orders")
+    @JsonBackReference // Changed to BackReference to prevent infinite loop with Store references
     private Store store;
 
     private Double totalPrice;
     private LocalDateTime date;
 
     @OneToMany(mappedBy = "order", fetch = FetchType.EAGER)
-    @JsonManagedReference("order-items")
+    @JsonManagedReference
     private List<OrderItem> orderItems;
 
+    // Constructors
     public OrderDetails() {}
 
     public OrderDetails(Customer customer, Store store, Double totalPrice, LocalDateTime date) {
@@ -38,6 +48,8 @@ public class OrderDetails {
         this.totalPrice = totalPrice;
         this.date = date;
     }
+
+    // Getters and Setters
 
     public Long getId() {
         return id;
